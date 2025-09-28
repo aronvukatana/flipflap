@@ -2,17 +2,21 @@
 
 # Module that can be included (mixin) to take and output TSV data
 module TsvBuddy
-  # Converts a String with TSV data into internal data structure @data
-  # arguments: tsv - a String in TSV format
-  # returns: nothing
-  def take_tsv(tsv)
+  TAB = "\t"
+  NEWLINE = "\n"
 
+  def row_hash(keys, values)
+    Hash[keys.zip(values)]
   end
 
-  # Converts @data into tsv string
-  # arguments: none
-  # returns: String in TSV format
-  def to_tsv
+  def take_tsv(tsv)
+    lines = tsv.lines(chomp: true)
+    headers = lines.shift.split(TAB)
+    @data = lines.map { |line| row_hash(headers, line.split(TAB)) }
+  end
 
+  def to_tsv
+    values = @data.map { |tsv_entry| tsv_entry.values.join(TAB) }.join(NEWLINE)
+    "#{@data[0].keys.join(TAB)}\n#{values}\n"
   end
 end
